@@ -1,26 +1,29 @@
-export default function BottomNav({ active, onChange }) {
+export default function BottomNav({ active, onChange, unreadCount }) {
   const tabs = [
     { id: 'home', label: 'Начало', icon: HomeIcon },
     { id: 'offers', label: 'Оферти', icon: OffersIcon },
     { id: 'schedule', label: 'График', icon: ScheduleIcon },
-    { id: 'notifications', label: 'Съобщения', icon: BellIcon },
+    { id: 'notifications', label: 'Съобщения', icon: BellIcon, badge: unreadCount },
     { id: 'profile', label: 'Профил', icon: ProfileIcon },
   ]
 
   return (
     <nav className="bg-white border-t border-gray-100 flex items-center justify-around px-2 py-2 safe-area-bottom shadow-lg">
-      {tabs.map(({ id, label, icon: Icon }) => (
+      {tabs.map(({ id, label, icon: Icon, badge }) => (
         <button
           key={id}
           onClick={() => onChange(id)}
           className="flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg transition-all"
         >
-          <Icon active={active === id} />
-          <span
-            className={`text-[10px] font-medium font-rubik ${
-              active === id ? 'text-primary' : 'text-text-muted'
-            }`}
-          >
+          <div className="relative">
+            <Icon active={active === id} />
+            {badge > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-danger flex items-center justify-center">
+                <span className="text-white text-[9px] font-bold leading-none">{badge > 9 ? '9+' : badge}</span>
+              </span>
+            )}
+          </div>
+          <span className={`text-[10px] font-medium font-rubik ${active === id ? 'text-primary' : 'text-text-muted'}`}>
             {label}
           </span>
         </button>
