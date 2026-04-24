@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import Onboarding from './screens/Onboarding'
 import Home from './screens/Home'
 import Offers from './screens/Offers'
 import Schedule from './screens/Schedule'
@@ -7,6 +6,7 @@ import Notifications from './screens/Notifications'
 import Profile from './screens/Profile'
 import Booking from './screens/Booking'
 import BottomNav from './components/BottomNav'
+import SideNav from './components/SideNav'
 
 const initialAppointments = [
   {
@@ -91,13 +91,12 @@ const initialNotifications = [
 ]
 
 export default function App() {
-  const [screen, setScreen] = useState('onboarding')
+  const [screen, setScreen] = useState('home')
   const [bookingBusiness, setBookingBusiness] = useState(null)
   const [favorites, setFavorites] = useState(new Set())
   const [appointments, setAppointments] = useState(initialAppointments)
   const [notifications, setNotifications] = useState(initialNotifications)
 
-  const mainScreens = ['home', 'offers', 'schedule', 'notifications', 'profile']
   const unreadCount = notifications.reduce((sum, n) => sum + (n.unread || 0), 0)
 
   function toggleFavorite(id) {
@@ -107,10 +106,6 @@ export default function App() {
       else next.add(id)
       return next
     })
-  }
-
-  function handleBook(business) {
-    setBookingBusiness(business)
   }
 
   function handleBookingSubmit(appointment) {
@@ -138,10 +133,6 @@ export default function App() {
     setScreen('schedule')
   }
 
-  function handleBookingClose() {
-    setBookingBusiness(null)
-  }
-
   function handleCancelAppointment(id) {
     setAppointments(prev => prev.filter(a => a.id !== id))
   }
@@ -158,42 +149,55 @@ export default function App() {
     )
   }
 
+  const navProps = { active: screen, onChange: setScreen, unreadCount }
+
   return (
-    <div className="flex flex-col h-screen">
-      <div className="flex-1 overflow-y-auto">
-        {screen === 'onboarding' && <Onboarding onDone={() => setScreen('home')} />}
-        {screen === 'home' && (
-          <Home
-            favorites={favorites}
-            onFavorite={toggleFavorite}
-            onBook={handleBook}
-          />
-        )}
-        {screen === 'offers' && <Offers onBook={handleBook} />}
-        {screen === 'schedule' && (
-          <Schedule
-            appointments={appointments}
-            onCancel={handleCancelAppointment}
-            onReschedule={handleRescheduleAppointment}
-          />
-        )}
-        {screen === 'notifications' && (
-          <Notifications
-            notifications={notifications}
-            onMarkRead={handleMarkRead}
-          />
-        )}
-        {screen === 'profile' && <Profile />}
+    <div className="flex h-screen bg-bg-light">
+      {/* Desktop sidebar */}
+      <aside className="hidden md:block shrink-0">
+        <SideNav {...navProps} />
+      </aside>
+
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <div className="flex-1 overflow-y-auto">
+          {screen === 'home' && (
+            <Home
+              favorites={favorites}
+              onFavorite={toggleFavorite}
+              onBook={setBookingBusiness}
+            />
+          )}
+          {screen === 'offers' && <Offers onBook={setBookingBusiness} />}
+          {screen === 'schedule' && (
+            <Schedule
+              appointments={appointments}
+              onCancel={handleCancelAppointment}
+              onReschedule={handleRescheduleAppointment}
+            />
+          )}
+          {screen === 'notifications' && (
+            <Notifications
+              notifications={notifications}
+              onMarkRead={handleMarkRead}
+            />
+          )}
+          {screen === 'profile' && <Profile />}
+        </div>
+
+        {/* Mobile bottom nav only */}
+        <div className="md:hidden">
+          <BottomNav {...navProps} />
+        </div>
       </div>
-      {mainScreens.includes(screen) && (
-        <BottomNav active={screen} onChange={setScreen} unreadCount={unreadCount} />
-      )}
+
+      {/* Booking modal */}
       {bookingBusiness && (
         <Booking
           business={bookingBusiness}
           onSubmit={handleBookingSubmit}
           onDone={handleBookingDone}
-          onClose={handleBookingClose}
+          onClose={() => setBookingBusiness(null)}
         />
       )}
     </div>

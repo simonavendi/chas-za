@@ -66,119 +66,158 @@ export default function Home({ favorites, onFavorite, onBook }) {
 
   return (
     <div className="bg-bg-light min-h-full font-rubik">
-      {/* Status bar */}
-      <div className="bg-white flex justify-between items-center px-5 pt-10 pb-2">
-        <span className="text-sm font-light text-gray-700">9:41</span>
-        <div className="flex gap-1 items-center">
-          <BarsIcon />
-          <WifiIcon />
-          <BatteryIcon />
-        </div>
-      </div>
 
-      {/* Search bar */}
-      <div className="bg-white px-4 pb-3">
-        <div className={`flex items-center bg-bg-light rounded-xl px-4 h-11 gap-3 border transition-colors ${
-          showFilter || filterActive ? 'border-primary' : 'border-gray-100'
-        }`}>
-          <SearchIcon />
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Търси бизнеси"
-            className="flex-1 bg-transparent text-sm text-text-dark outline-none placeholder:text-text-muted"
-          />
-          {search && (
-            <button onClick={() => setSearch('')} className="shrink-0">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M10 4L4 10M4 4L10 10" stroke="#C7CBCF" strokeWidth="1.5" strokeLinecap="round" />
-              </svg>
+      {/* ── MOBILE header (status bar + search) ── */}
+      <div className="md:hidden">
+        <div className="bg-white flex justify-between items-center px-5 pt-10 pb-2">
+          <span className="text-sm font-light text-gray-700">9:41</span>
+          <div className="flex gap-1 items-center">
+            <BarsIcon /><WifiIcon /><BatteryIcon />
+          </div>
+        </div>
+        <div className="bg-white px-4 pb-3">
+          <div className={`flex items-center bg-bg-light rounded-xl px-4 h-11 gap-3 border transition-colors ${filterActive || showFilter ? 'border-primary' : 'border-gray-100'}`}>
+            <SearchIcon />
+            <input
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Търси бизнеси"
+              className="flex-1 bg-transparent text-sm text-text-dark outline-none placeholder:text-text-muted"
+            />
+            {search && (
+              <button onClick={() => setSearch('')} className="shrink-0">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M10 4L4 10M4 4L10 10" stroke="#C7CBCF" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+              </button>
+            )}
+            <button onClick={() => setShowFilter(f => !f)} className="ml-auto shrink-0">
+              <FilterIcon active={filterActive} />
             </button>
-          )}
-          <button
-            onClick={() => setShowFilter(f => !f)}
-            className={`ml-auto shrink-0 ${filterActive ? 'text-primary' : ''}`}
-          >
-            <FilterIcon active={filterActive} />
-          </button>
+          </div>
         </div>
+        {showFilter && (
+          <div className="bg-white px-4 pb-3 border-b border-gray-100">
+            <div className="flex gap-2 flex-wrap">
+              {CATEGORIES.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => { setActiveCategory(cat); setShowFilter(false) }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${activeCategory === cat ? 'bg-primary text-white' : 'bg-bg-blue text-text-dark'}`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Category filter dropdown */}
-      {showFilter && (
-        <div className="bg-white px-4 pb-3 border-b border-gray-100">
-          <div className="flex gap-2 flex-wrap">
+      {/* ── DESKTOP header ── */}
+      <div className="hidden md:block bg-white border-b border-gray-100 px-8 py-5">
+        <div className="flex items-center justify-between gap-6">
+          <div>
+            <h1 className="text-navy-2 text-2xl font-bold font-inter">Намери специалист</h1>
+            <p className="text-text-muted text-sm mt-0.5">Запази час онлайн за минути</p>
+          </div>
+          <div className="flex items-center gap-3 w-96">
+            <div className={`flex-1 flex items-center bg-bg-light rounded-xl px-4 h-11 gap-3 border transition-colors ${filterActive || showFilter ? 'border-primary' : 'border-gray-200'}`}>
+              <SearchIcon />
+              <input
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Търси по название или категория"
+                className="flex-1 bg-transparent text-sm text-text-dark outline-none placeholder:text-text-muted"
+              />
+              {search && (
+                <button onClick={() => setSearch('')} className="shrink-0">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M10 4L4 10M4 4L10 10" stroke="#C7CBCF" strokeWidth="1.5" strokeLinecap="round" />
+                  </svg>
+                </button>
+              )}
+            </div>
+            <button
+              onClick={() => setShowFilter(f => !f)}
+              className={`flex items-center gap-2 px-4 h-11 rounded-xl border text-sm font-medium transition-all ${filterActive ? 'border-primary bg-primary/5 text-primary' : 'border-gray-200 bg-white text-text-dark hover:border-gray-300'}`}
+            >
+              <FilterIcon active={filterActive} />
+              Филтър
+            </button>
+          </div>
+        </div>
+
+        {/* Desktop filter dropdown */}
+        {showFilter && (
+          <div className="mt-4 flex gap-2 flex-wrap">
             {CATEGORIES.map(cat => (
               <button
                 key={cat}
                 onClick={() => { setActiveCategory(cat); setShowFilter(false) }}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                  activeCategory === cat ? 'bg-primary text-white' : 'bg-bg-blue text-text-dark'
-                }`}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeCategory === cat ? 'bg-primary text-white' : 'bg-bg-light text-text-dark hover:bg-gray-100'}`}
               >
                 {cat}
               </button>
             ))}
           </div>
-        </div>
-      )}
-
-      {/* Tabs */}
-      <div className="bg-white px-4 pb-3">
-        <div className="flex bg-bg-light rounded-full p-0.5">
-          <button
-            onClick={() => setTab('all')}
-            className={`flex-1 py-2 rounded-full text-sm font-bold transition-all ${
-              tab === 'all' ? 'bg-primary text-white' : 'text-text-dark'
-            }`}
-          >
-            Общо
-          </button>
-          <button
-            onClick={() => setTab('fav')}
-            className={`flex-1 py-2 rounded-full text-sm font-bold transition-all ${
-              tab === 'fav' ? 'bg-primary text-white' : 'text-text-dark'
-            }`}
-          >
-            Любими {favorites.size > 0 && `(${favorites.size})`}
-          </button>
-        </div>
+        )}
       </div>
 
-      {/* Location */}
-      <div className="px-4 py-2 bg-white flex items-center gap-1 border-b border-gray-100">
-        <LocationIcon />
-        <span className="text-sm font-medium font-inter text-navy">Варна, България</span>
-        <ChevronIcon />
-      </div>
-
-      {/* Info banner */}
-      {bannerVisible && (
-        <div className="mx-4 mt-3 bg-bg-blue rounded-xl p-3 flex items-start gap-3">
-          <div className="mt-0.5 shrink-0">
-            <InfoIcon />
+      {/* ── Shared controls (tabs + location) ── */}
+      <div className="bg-white px-4 md:px-8 pb-3 pt-3 md:pt-0 md:pb-0">
+        <div className="md:flex md:items-center md:justify-between md:border-b md:border-gray-100 md:py-3">
+          <div className="flex bg-bg-light md:bg-transparent rounded-full md:rounded-none p-0.5 md:p-0 md:gap-4">
+            <button
+              onClick={() => setTab('all')}
+              className={`flex-1 md:flex-none py-2 md:py-1.5 px-4 rounded-full text-sm font-bold transition-all ${tab === 'all' ? 'bg-primary text-white md:bg-transparent md:text-primary md:border-b-2 md:border-primary md:rounded-none' : 'text-text-dark'}`}
+            >
+              Общо
+            </button>
+            <button
+              onClick={() => setTab('fav')}
+              className={`flex-1 md:flex-none py-2 md:py-1.5 px-4 rounded-full text-sm font-bold transition-all ${tab === 'fav' ? 'bg-primary text-white md:bg-transparent md:text-primary md:border-b-2 md:border-primary md:rounded-none' : 'text-text-dark'}`}
+            >
+              Любими {favorites.size > 0 && `(${favorites.size})`}
+            </button>
           </div>
-          <p className="text-navy text-xs font-medium font-inter flex-1 leading-relaxed">
-            Можеш да промениш локацията си за да видиш обекти за друго място.
-          </p>
-          <button className="ml-1 shrink-0 p-1" onClick={() => setBannerVisible(false)}>
-            <CloseIcon />
-          </button>
+          <div className="hidden md:flex items-center gap-1 text-sm text-text-muted">
+            <LocationIcon />
+            <span className="font-medium text-navy">Варна, България</span>
+          </div>
         </div>
-      )}
-
-      {/* Title */}
-      <div className="px-4 py-4">
-        <h1 className="text-navy-2 text-2xl font-bold font-inter leading-tight">
-          Запази час онлайн за различните услуги, които ползваш!
-        </h1>
       </div>
 
-      {/* Business cards */}
-      <div className="px-4 pb-4">
+      {/* Mobile location + banner */}
+      <div className="md:hidden">
+        <div className="px-4 py-2 bg-white flex items-center gap-1 border-b border-gray-100">
+          <LocationIcon />
+          <span className="text-sm font-medium font-inter text-navy">Варна, България</span>
+          <ChevronIcon />
+        </div>
+        {bannerVisible && (
+          <div className="mx-4 mt-3 bg-bg-blue rounded-xl p-3 flex items-start gap-3">
+            <div className="mt-0.5 shrink-0"><InfoIcon /></div>
+            <p className="text-navy text-xs font-medium font-inter flex-1 leading-relaxed">
+              Можеш да промениш локацията си за да видиш обекти за друго място.
+            </p>
+            <button className="ml-1 shrink-0 p-1" onClick={() => setBannerVisible(false)}>
+              <CloseIcon />
+            </button>
+          </div>
+        )}
+        <div className="px-4 py-4">
+          <h1 className="text-navy-2 text-2xl font-bold font-inter leading-tight">
+            Запази час онлайн за различните услуги, които ползваш!
+          </h1>
+        </div>
+      </div>
+
+      {/* ── Business cards ── */}
+      <div className="px-4 md:px-8 pb-8 md:pt-6">
         {displayed.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="flex flex-col items-center justify-center py-20 text-center">
             <svg width="48" height="48" viewBox="0 0 48 48" fill="none" className="mb-3 opacity-30">
               <circle cx="22" cy="22" r="16" stroke="#4A4A4A" strokeWidth="2" />
               <line x1="33" y1="33" x2="44" y2="44" stroke="#4A4A4A" strokeWidth="2" strokeLinecap="round" />
@@ -191,15 +230,17 @@ export default function Home({ favorites, onFavorite, onBook }) {
             )}
           </div>
         ) : (
-          displayed.map(b => (
-            <BusinessCard
-              key={b.id}
-              business={b}
-              onBook={onBook}
-              isFavorite={favorites.has(b.id)}
-              onFavorite={onFavorite}
-            />
-          ))
+          <div className="md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-5">
+            {displayed.map(b => (
+              <BusinessCard
+                key={b.id}
+                business={b}
+                onBook={onBook}
+                isFavorite={favorites.has(b.id)}
+                onFavorite={onFavorite}
+              />
+            ))}
+          </div>
         )}
       </div>
     </div>
