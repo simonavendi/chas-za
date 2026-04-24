@@ -34,3 +34,21 @@ body {
     box-shadow: none;
   }
 }
+
+@media (min-width: 768px) {
+  body {
+    background: #f0f2f5;
+    display: block;
+    align-items: unset;
+    justify-content: unset;
+  }
+
+  #root {
+    width: 100%;
+    max-width: none;
+    box-shadow: none;
+    overflow: visible;
+    min-height: 100vh;
+    height: 100vh;
+  }
+}
