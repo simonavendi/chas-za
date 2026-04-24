@@ -40,12 +40,29 @@ const businesses = [
   },
 ]
 
-const favorites = businesses.filter(b => b.reviews > 30)
+const CATEGORIES = ['Всички', 'Зъболекар', 'Масажист', 'Фризьор', 'Козметик']
 
-export default function Home() {
+export default function Home({ favorites, onFavorite, onBook }) {
   const [tab, setTab] = useState('all')
+  const [search, setSearch] = useState('')
+  const [showFilter, setShowFilter] = useState(false)
+  const [activeCategory, setActiveCategory] = useState('Всички')
+  const [bannerVisible, setBannerVisible] = useState(true)
 
-  const displayed = tab === 'all' ? businesses : favorites
+  let displayed = tab === 'all' ? businesses : businesses.filter(b => favorites.has(b.id))
+
+  if (search.trim()) {
+    const q = search.toLowerCase()
+    displayed = displayed.filter(b =>
+      b.name.toLowerCase().includes(q) || b.category.toLowerCase().includes(q)
+    )
+  }
+
+  if (activeCategory !== 'Всички') {
+    displayed = displayed.filter(b => b.category === activeCategory)
+  }
+
+  const filterActive = activeCategory !== 'Всички'
 
   return (
     <div className="bg-bg-light min-h-full font-rubik">
@@ -61,14 +78,51 @@ export default function Home() {
 
       {/* Search bar */}
       <div className="bg-white px-4 pb-3">
-        <div className="flex items-center bg-bg-light rounded-xl px-4 h-11 gap-3 border border-gray-100">
+        <div className={`flex items-center bg-bg-light rounded-xl px-4 h-11 gap-3 border transition-colors ${
+          showFilter || filterActive ? 'border-primary' : 'border-gray-100'
+        }`}>
           <SearchIcon />
-          <span className="text-text-muted text-sm">Търси бизнеси</span>
-          <div className="ml-auto">
-            <FilterIcon />
-          </div>
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Търси бизнеси"
+            className="flex-1 bg-transparent text-sm text-text-dark outline-none placeholder:text-text-muted"
+          />
+          {search && (
+            <button onClick={() => setSearch('')} className="shrink-0">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M10 4L4 10M4 4L10 10" stroke="#C7CBCF" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            </button>
+          )}
+          <button
+            onClick={() => setShowFilter(f => !f)}
+            className={`ml-auto shrink-0 ${filterActive ? 'text-primary' : ''}`}
+          >
+            <FilterIcon active={filterActive} />
+          </button>
         </div>
       </div>
+
+      {/* Category filter dropdown */}
+      {showFilter && (
+        <div className="bg-white px-4 pb-3 border-b border-gray-100">
+          <div className="flex gap-2 flex-wrap">
+            {CATEGORIES.map(cat => (
+              <button
+                key={cat}
+                onClick={() => { setActiveCategory(cat); setShowFilter(false) }}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                  activeCategory === cat ? 'bg-primary text-white' : 'bg-bg-blue text-text-dark'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="bg-white px-4 pb-3">
@@ -87,7 +141,7 @@ export default function Home() {
               tab === 'fav' ? 'bg-primary text-white' : 'text-text-dark'
             }`}
           >
-            Любими
+            Любими {favorites.size > 0 && `(${favorites.size})`}
           </button>
         </div>
       </div>
@@ -100,17 +154,19 @@ export default function Home() {
       </div>
 
       {/* Info banner */}
-      <div className="mx-4 mt-3 bg-bg-blue rounded-xl p-3 flex items-start gap-3">
-        <div className="mt-0.5">
-          <InfoIcon />
+      {bannerVisible && (
+        <div className="mx-4 mt-3 bg-bg-blue rounded-xl p-3 flex items-start gap-3">
+          <div className="mt-0.5 shrink-0">
+            <InfoIcon />
+          </div>
+          <p className="text-navy text-xs font-medium font-inter flex-1 leading-relaxed">
+            Можеш да промениш локацията си за да видиш обекти за друго място.
+          </p>
+          <button className="ml-1 shrink-0 p-1" onClick={() => setBannerVisible(false)}>
+            <CloseIcon />
+          </button>
         </div>
-        <p className="text-navy text-xs font-medium font-inter flex-1 leading-relaxed">
-          Можеш да промениш локацията си за да видиш обекти за друго място.
-        </p>
-        <button className="ml-1">
-          <CloseIcon />
-        </button>
-      </div>
+      )}
 
       {/* Title */}
       <div className="px-4 py-4">
@@ -121,9 +177,30 @@ export default function Home() {
 
       {/* Business cards */}
       <div className="px-4 pb-4">
-        {displayed.map(b => (
-          <BusinessCard key={b.id} business={b} />
-        ))}
+        {displayed.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" className="mb-3 opacity-30">
+              <circle cx="22" cy="22" r="16" stroke="#4A4A4A" strokeWidth="2" />
+              <line x1="33" y1="33" x2="44" y2="44" stroke="#4A4A4A" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+            <p className="text-text-muted text-sm font-medium">
+              {tab === 'fav' ? 'Няма любими бизнеси' : 'Няма намерени бизнеси'}
+            </p>
+            {tab === 'fav' && (
+              <p className="text-text-muted text-xs mt-1">Натисни ❤ на карта за да добавиш</p>
+            )}
+          </div>
+        ) : (
+          displayed.map(b => (
+            <BusinessCard
+              key={b.id}
+              business={b}
+              onBook={onBook}
+              isFavorite={favorites.has(b.id)}
+              onFavorite={onFavorite}
+            />
+          ))
+        )}
       </div>
     </div>
   )
@@ -138,12 +215,13 @@ function SearchIcon() {
   )
 }
 
-function FilterIcon() {
+function FilterIcon({ active }) {
+  const color = active ? '#6FDB45' : '#C7CBCF'
   return (
     <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
-      <line x1="0" y1="1" x2="16" y2="1" stroke="#C7CBCF" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="2" y1="6" x2="14" y2="6" stroke="#C7CBCF" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="4" y1="11" x2="12" y2="11" stroke="#C7CBCF" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="0" y1="1" x2="16" y2="1" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="2" y1="6" x2="14" y2="6" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="4" y1="11" x2="12" y2="11" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   )
 }
@@ -174,8 +252,8 @@ function InfoIcon() {
 
 function CloseIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <path d="M12 4L4 12M4 4L12 12" stroke="#2E3E5C" strokeWidth="1.5" strokeLinecap="round" />
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M10.5 3.5L3.5 10.5M3.5 3.5L10.5 10.5" stroke="#2E3E5C" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   )
 }
