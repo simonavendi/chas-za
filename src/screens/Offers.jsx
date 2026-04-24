@@ -1,115 +1,47 @@
-import BusinessCard from '../components/BusinessCard'
+import { PhImg } from '../components/Icons'
 
-const offers = [
-  {
-    id: 5,
-    name: 'Булдент',
-    category: 'Зъболекар',
-    image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=400&h=300&fit=crop',
-    tags: ['−30% отстъпка', 'Свободни часове', 'Близка локация'],
-    reviews: 21,
-    badge: 'Специална оферта',
-  },
-  {
-    id: 6,
-    name: 'Studio Lux',
-    category: 'Масажист',
-    image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=400&h=300&fit=crop',
-    tags: ['−20% масаж', 'Близка локация'],
-    reviews: 47,
-    badge: 'Само днес',
-  },
-  {
-    id: 7,
-    name: 'Натали Козметика',
-    category: 'Козметик',
-    image: 'https://images.unsplash.com/photo-1571875257727-256c39da42af?w=400&h=300&fit=crop',
-    tags: ['−15% лечебни процедури', 'Свободни часове'],
-    reviews: 29,
-    badge: 'Топ оферта',
-  },
-  {
-    id: 8,
-    name: 'Natasha Hair',
-    category: 'Фризьор',
-    image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&h=300&fit=crop',
-    tags: ['−25% боядисване', 'Близка локация'],
-    reviews: 33,
-    badge: 'Ограничена оферта',
-  },
+const OFFERS = [
+  { id: 1, biz: 'Excel Beauty Center', svc: 'Маникюр', img: '/assets/beauty-center.jpg', clr: null,
+    disc: '-30%', pNew: '17.50лв', pOld: '25лв', val: 'Валидно до 28 Февруари 2022' },
+  { id: 2, biz: 'Studio Lux', svc: 'СПА пакет', img: null, clr: '#8B5CF6',
+    disc: '-20%', pNew: '96лв', pOld: '120лв', val: 'Валидно до 15 Февруари 2022' },
+  { id: 3, biz: 'Natasha Hair', svc: 'Боя за коса', img: null, clr: '#F59E0B',
+    disc: '-15%', pNew: '68лв', pOld: '80лв', val: 'Валидно до 28 Февруари 2022' },
+  { id: 4, biz: 'Козметик Добромира', svc: 'Дълбоко почистване', img: null, clr: '#EC4899',
+    disc: '-25%', pNew: '41лв', pOld: '55лв', val: 'Валидно до 7 Март 2022' },
 ]
 
-export default function Offers({ onBook }) {
+export default function Offers() {
   return (
-    <div className="bg-bg-light min-h-full font-rubik">
-
-      {/* ── MOBILE header ── */}
-      <div className="md:hidden">
-        <div className="bg-white flex justify-between items-center px-5 pt-10 pb-2">
-          <span className="text-sm font-light text-gray-700">9:41</span>
-          <div className="flex gap-1 items-center">
-            <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
-              <rect x="0" y="0" width="17" height="2" rx="1" fill="#2a2b2a" />
-              <rect x="0" y="4.5" width="17" height="2" rx="1" fill="#2a2b2a" />
-              <rect x="0" y="9" width="17" height="2" rx="1" fill="#2a2b2a" />
-            </svg>
-          </div>
-        </div>
-        <div className="bg-white px-4 pb-3">
-          <div className="flex items-center bg-bg-light rounded-xl px-4 h-11 gap-3 border border-gray-100">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <circle cx="7" cy="7" r="5" stroke="#C7CBCF" strokeWidth="1.5" />
-              <line x1="11" y1="11" x2="15" y2="15" stroke="#C7CBCF" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-            <span className="text-text-muted text-sm">Търси оферти</span>
-          </div>
-        </div>
-        <div className="bg-white px-4 pb-3">
-          <div className="inline-flex bg-primary rounded-full px-5 py-2">
-            <span className="text-white text-sm font-bold">Специални оферти</span>
-          </div>
-        </div>
-        <div className="px-4 py-2 bg-white flex items-center gap-1 border-b border-gray-100">
-          <svg width="11" height="13" viewBox="0 0 11 13" fill="none">
-            <path d="M5.5 0C3.01 0 1 2.01 1 4.5C1 7.88 5.5 13 5.5 13C5.5 13 10 7.88 10 4.5C10 2.01 7.99 0 5.5 0ZM5.5 6C4.67 6 4 5.33 4 4.5C4 3.67 4.67 3 5.5 3C6.33 3 7 3.67 7 4.5C7 5.33 6.33 6 5.5 6Z" fill="#6FDB45" />
-          </svg>
-          <span className="text-sm font-medium font-inter text-navy">Варна, България</span>
-        </div>
-        <div className="mx-4 mt-3 bg-bg-blue rounded-xl p-3 flex items-start gap-3">
-          <div className="w-8 h-8 rounded-full bg-navy-2 flex items-center justify-center mt-0.5 shrink-0">
-            <span className="text-white text-xs font-bold">i</span>
-          </div>
-          <p className="text-navy text-xs font-medium font-inter flex-1 leading-relaxed">
-            Специалните оферти се обновяват ежедневно. Не пропускай изгодните цени!
-          </p>
-        </div>
-        <div className="px-4 py-4">
-          <h1 className="text-navy-2 text-2xl font-bold font-inter leading-tight">
-            Специално подбрани оферти на промоционални за теб цени!
-          </h1>
-        </div>
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }} className="pg-enter">
+      <div className="topbar">
+        <span className="topbar-title">Специални оферти</span>
       </div>
 
-      {/* ── DESKTOP header ── */}
-      <div className="hidden md:block bg-white border-b border-gray-100 px-8 py-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-navy-2 text-2xl font-bold font-inter">Специални оферти</h1>
-            <p className="text-text-muted text-sm mt-0.5">Промоционални цени, обновявани ежедневно</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="bg-primary/10 text-primary text-sm font-semibold px-4 py-2 rounded-full">
-              {offers.length} активни оферти
-            </span>
-          </div>
+      <div className="pg">
+        <div className="offer-hero">
+          <div className="offer-hero-lbl">Ексклузивно за теб</div>
+          <div className="offer-hero-ttl">Специално подбрани оферти на промоционални за теб цени!</div>
         </div>
-      </div>
 
-      {/* ── Cards ── */}
-      <div className="px-4 md:px-8 pb-8 md:pt-6">
-        <div className="md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-5">
-          {offers.map(b => (
-            <BusinessCard key={b.id} business={b} onBook={onBook} />
+        <div className="off-grid">
+          {OFFERS.map(o => (
+            <div key={o.id} className="off-card">
+              <div className="off-img">
+                {o.img ? <img src={o.img} alt={o.biz} /> : <PhImg color={o.clr} name={o.biz} />}
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom,rgba(0,0,0,.1),rgba(0,0,0,.4))' }} />
+                <div className="off-disc">{o.disc}</div>
+              </div>
+              <div className="off-body">
+                <div className="off-name">{o.biz}</div>
+                <div className="off-svc">{o.svc}</div>
+                <div className="off-prices">
+                  <span className="off-new">{o.pNew}</span>
+                  <span className="off-old">{o.pOld}</span>
+                </div>
+                <div className="off-val">{o.val}</div>
+              </div>
+            </div>
           ))}
         </div>
       </div>

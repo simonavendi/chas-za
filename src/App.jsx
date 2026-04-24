@@ -1,205 +1,41 @@
 import { useState } from 'react'
+import Onboarding from './screens/Onboarding'
 import Home from './screens/Home'
 import Offers from './screens/Offers'
 import Schedule from './screens/Schedule'
 import Notifications from './screens/Notifications'
 import Profile from './screens/Profile'
-import Booking from './screens/Booking'
-import BottomNav from './components/BottomNav'
-import SideNav from './components/SideNav'
-
-const initialAppointments = [
-  {
-    id: 1,
-    date: '29 Април 14:00',
-    business: 'Салон за маникюр',
-    procedure: 'Маникюр с гел лак',
-    duration: 'Приблизително 1 час',
-    prepaid: true,
-    location: 'ул. Цар Симеон I 45, Варна',
-    day: 29,
-    month: 3,
-    year: 2026,
-  },
-  {
-    id: 2,
-    date: '15 Февруари 10:30',
-    business: 'Булдент',
-    procedure: 'Профилактичен преглед',
-    duration: 'Приблизително 30 мин',
-    prepaid: false,
-    location: 'ул. Дондуков 12, Варна',
-    day: 15,
-    month: 1,
-    year: 2026,
-  },
-]
-
-const initialNotifications = [
-  {
-    id: 1,
-    name: 'Studio Lux',
-    role: 'Масажист',
-    text: 'Благодарим за посещението. Можете да оставите отзив за нас!',
-    time: '8 фев',
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face',
-    unread: 0,
-    status: 'yellow',
-  },
-  {
-    id: 2,
-    name: 'Excel',
-    role: 'Маникюр',
-    text: 'Напомняме Ви, че имате записан час утре в 14:00.',
-    time: '07:34 PM',
-    avatar: null,
-    initials: 'EX',
-    unread: 2,
-    status: 'green',
-    highlight: true,
-  },
-  {
-    id: 3,
-    name: 'Георги Георгиев',
-    role: 'Зъболекар',
-    text: 'Потвърждаваме часа Ви от 7 на 15 февруари.',
-    time: 'Вчера',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face',
-    unread: 0,
-    status: 'green',
-  },
-  {
-    id: 4,
-    name: 'Natasha Hair',
-    role: 'Фризьор',
-    text: 'Съжаляваме да ви уведомим, че заявеният от Вас час е отменен.',
-    time: 'Вчера',
-    avatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=80&h=80&fit=crop&crop=face',
-    unread: 0,
-    status: 'red',
-  },
-  {
-    id: 5,
-    name: 'Анелия Христова',
-    role: 'Козметик',
-    text: 'Благодарим за посещениято. Моля оставете отзив.',
-    time: '8 фев',
-    avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80&h=80&fit=crop&crop=face',
-    unread: 0,
-    status: 'yellow',
-  },
-]
+import Sidebar from './components/Sidebar'
+import Toast from './components/Toast'
 
 export default function App() {
-  const [screen, setScreen] = useState('home')
-  const [bookingBusiness, setBookingBusiness] = useState(null)
-  const [favorites, setFavorites] = useState(new Set())
-  const [appointments, setAppointments] = useState(initialAppointments)
-  const [notifications, setNotifications] = useState(initialNotifications)
+  const [screen, setScreen] = useState('onboarding')
+  const [page, setPage] = useState('biz')
+  const [toast, setToast] = useState(null)
 
-  const unreadCount = notifications.reduce((sum, n) => sum + (n.unread || 0), 0)
+  const book = (biz, time) => setToast(`Успешно запазен час при ${biz} в ${time}!`)
 
-  function toggleFavorite(id) {
-    setFavorites(prev => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
-  }
-
-  function handleBookingSubmit(appointment) {
-    setAppointments(prev => [appointment, ...prev])
-    const initials = appointment.business.slice(0, 2).toUpperCase()
-    setNotifications(prev => [
-      {
-        id: Date.now(),
-        name: appointment.business,
-        role: 'Потвърждение',
-        text: `Вашият час за ${appointment.procedure} е потвърден: ${appointment.date}.`,
-        time: 'Сега',
-        avatar: appointment.businessImage || null,
-        initials: appointment.businessImage ? undefined : initials,
-        unread: 1,
-        status: 'green',
-        highlight: true,
-      },
-      ...prev,
-    ])
-  }
-
-  function handleBookingDone() {
-    setBookingBusiness(null)
-    setScreen('schedule')
-  }
-
-  function handleCancelAppointment(id) {
-    setAppointments(prev => prev.filter(a => a.id !== id))
-  }
-
-  function handleRescheduleAppointment(id, updates) {
-    setAppointments(prev =>
-      prev.map(a => a.id === id ? { ...a, ...updates } : a)
-    )
-  }
-
-  function handleMarkRead(id) {
-    setNotifications(prev =>
-      prev.map(n => n.id === id ? { ...n, unread: 0, highlight: false } : n)
-    )
-  }
-
-  const navProps = { active: screen, onChange: setScreen, unreadCount }
-
-  return (
-    <div className="flex h-screen bg-bg-light">
-      {/* Desktop sidebar */}
-      <aside className="hidden md:block shrink-0">
-        <SideNav {...navProps} />
-      </aside>
-
-      {/* Main content area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <div className="flex-1 overflow-y-auto">
-          {screen === 'home' && (
-            <Home
-              favorites={favorites}
-              onFavorite={toggleFavorite}
-              onBook={setBookingBusiness}
-            />
-          )}
-          {screen === 'offers' && <Offers onBook={setBookingBusiness} />}
-          {screen === 'schedule' && (
-            <Schedule
-              appointments={appointments}
-              onCancel={handleCancelAppointment}
-              onReschedule={handleRescheduleAppointment}
-            />
-          )}
-          {screen === 'notifications' && (
-            <Notifications
-              notifications={notifications}
-              onMarkRead={handleMarkRead}
-            />
-          )}
-          {screen === 'profile' && <Profile />}
-        </div>
-
-        {/* Mobile bottom nav only */}
-        <div className="md:hidden">
-          <BottomNav {...navProps} />
+  if (screen === 'onboarding') {
+    return (
+      <div style={{ width: '100%', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)' }}>
+        <div style={{ width: 390, height: 700, background: 'white', borderRadius: 24, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,.2)', display: 'flex', flexDirection: 'column' }}>
+          <Onboarding onDone={() => setScreen('main')} />
         </div>
       </div>
+    )
+  }
 
-      {/* Booking modal */}
-      {bookingBusiness && (
-        <Booking
-          business={bookingBusiness}
-          onSubmit={handleBookingSubmit}
-          onDone={handleBookingDone}
-          onClose={() => setBookingBusiness(null)}
-        />
-      )}
-    </div>
+  return (
+    <>
+      <Sidebar pg={page} setPg={setPage} />
+      <div className="main" key={page}>
+        {page === 'biz' && <Home onBook={book} />}
+        {page === 'off' && <Offers />}
+        {page === 'sch' && <Schedule />}
+        {page === 'msg' && <Notifications />}
+        {page === 'pro' && <Profile />}
+      </div>
+      {toast && <Toast msg={toast} onDone={() => setToast(null)} />}
+    </>
   )
 }

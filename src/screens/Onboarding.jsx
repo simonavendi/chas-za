@@ -37,7 +37,7 @@ export default function Onboarding({ onDone }) {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-white font-rubik">
+    <div className="flex flex-col h-full bg-white font-rubik">
       {/* Skip */}
       <div className="flex justify-end px-6 pt-12">
         <button onClick={onDone} className="text-primary text-base font-normal">
